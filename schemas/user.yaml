@@ -1,0 +1,93 @@
+user:
+  schema:
+    id:
+      type: integer
+      nullable: false
+      description: "Unique user identifier (internal incremental id in generated data)"
+    first_name:
+      type: string
+      nullable: false
+      checks:
+        str_length:
+          min_value: 1
+          max_value: 100
+      description: "User first name"
+    last_name:
+      type: string
+      nullable: false
+      checks:
+        str_length:
+          min_value: 1
+          max_value: 100
+      description: "User last name"
+    email:
+      type: string
+      nullable: false
+      description: "User email address"
+    created_at:
+      type: string
+      nullable: false
+      description: "ISO-8601 datetime string when the record was created"
+    is_active:
+      type: boolean
+      nullable: false
+      description: "Whether the user is active"
+    country:
+      type: string
+      nullable: false
+      description: "ISO 3166-1 alpha-2 country code"
+    system_x_id:
+      type: string
+      nullable: false
+      description: "External System X identifier (may contain leading zeros)"
+
+  rules:
+    id:
+      not_null: true
+      range:
+        min: 1
+        max: 1000000000
+
+    first_name:
+      not_null: true
+      str_length:
+        min: 1
+        max: 100
+
+    last_name:
+      not_null: true
+      str_length:
+        min: 1
+        max: 100
+
+    email:
+      not_null: true
+      pattern:
+        regex: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        description: "Must look like a valid email address"
+
+    created_at:
+      not_null: true
+      pattern:
+        regex: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?$"
+        description: "Must be ISO-8601 datetime like 2011-07-01T17:26:53 or with fractional seconds"
+
+    is_active:
+      not_null: true
+
+    country:
+      not_null: true
+      pattern:
+        regex: "^[A-Z]{2}$"
+        description: "Must be ISO 3166-1 alpha-2 (2 uppercase letters)"
+      # optional example: restrict to a smaller set for a specific project
+      # allowed: ["CH", "DE", "US", "GB"]
+
+    system_x_id:
+      not_null: true
+      str_length:
+        min: 6
+        max: 6
+      pattern:
+        regex: "^\\d{6}$"
+        description: "Must be exactly 6 digits (leading zeros allowed)"

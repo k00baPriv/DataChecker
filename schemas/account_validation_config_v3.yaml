@@ -1,0 +1,78 @@
+account:
+  schema:
+    Id:
+      type: string
+      nullable: false
+      description: "Unique Salesforce account identifier"
+    Name:
+      type: string
+      nullable: false
+      checks:
+        str_length:
+          min_value: 1
+    FocusCustomer__c:
+      type: boolean
+      nullable: true
+    FleetAccount__c:
+      type: boolean
+      nullable: true
+    OnTrackAccount__c:
+      type: boolean
+      nullable: true
+    R12MSales__c:
+      type: float
+      nullable: true
+      checks:
+        ge: 0
+    AccountGroup__c:
+      type: integer
+      nullable: true
+    LoyaltyStage__c:
+      type: string
+      nullable: true
+
+    # ✅ Flattened billing address fields
+    BillingAddress_city:
+      type: string
+      nullable: true
+    BillingAddress_country:
+      type: string
+      nullable: true
+    BillingAddress_geocodeAccuracy:
+      type: string
+      nullable: true
+    BillingAddress_latitude:
+      type: float
+      nullable: true
+    BillingAddress_longitude:
+      type: float
+      nullable: true
+    BillingAddress_postalCode:
+      type: string
+      nullable: true
+    BillingAddress_state:
+      type: string
+      nullable: true
+    BillingAddress_street:
+      type: string
+      nullable: true
+
+  rules:
+    Id:
+      pattern:
+        regex: "^a01[a-zA-Z0-9]{12,15}$"
+        description: "Must be a valid Salesforce Account ID (starts with '001', 15–18 chars)"
+      not_null: true
+      str_length:
+        min: 15
+        max: 18
+    R12MSales__c:
+      range:
+        min: 0
+        max: 80000
+    Name:
+      not_null: true
+    AccountGroup__c:
+      allowed: [1, 2]
+    LoyaltyStage__c:
+      allowed: ['Frequent', 'Active', 'Engaged']
