@@ -124,7 +124,7 @@ ValidationEngine --> PlanCompiler
 ValidationEngine --> BatchSource
 ValidationEngine --> BatchValidator
 ValidationEngine --> Sink
-
+```
 
 ## Project structure
 
