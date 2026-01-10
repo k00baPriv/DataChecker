@@ -7,6 +7,34 @@ name = "datachecker"
 version = "0.1.0"
 requires-python = ">=3.10"
 
+dependencies = [
+  "pydantic>=2.5",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+  "mypy>=1.8",
+  "ruff>=0.4",
+  "pip-audit>=2.7",
+  "bandit>=1.7",
+  "types-PyYAML",
+]
+
+notebooks = [
+  "ipykernel>=6.0",
+  "pandas>=2.0",
+  "pandas-stubs",
+  "Faker",
+]
+
+pandera = [
+  "pandera>=0.18",
+  "pandas>=2.0",
+]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
