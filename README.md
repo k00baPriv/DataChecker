@@ -32,7 +32,99 @@ This repository is intentionally designed as a **learning-friendly but productio
   - test coverage (`pytest`)
   - code quality (`ruff`)
 
----
+
+## Architecture Overview
+
+The diagram below shows the high-level architecture of the DataChecker engine,
+including schema loading, plan compilation, batch processing, validation, and reporting.
+
+```mermaid
+classDiagram
+direction LR
+
+class ValidationEngine {
+  -schema_loader: SchemaLoader
+  -plan_compiler: PlanCompiler
+  -source: BatchSource
+  -validator: BatchValidator
+  -sink: Sink
+  +run(schema_ref, source_ref, report_ref)
+}
+
+class SchemaLoader {
+  <<interface>>
+  +load(schema_ref) SchemaSpec
+}
+
+class YamlSchemaLoader {
+  +load(schema_ref) SchemaSpec
+}
+SchemaLoader <|.. YamlSchemaLoader
+
+class SchemaSpec {
+  <<dataclass>>
+  +name: str
+  +version: str
+  +raw: dict
+}
+
+class PlanCompiler {
+  <<interface>>
+  +compile(spec) ValidationPlan
+}
+
+class DefaultPlanCompiler {
+  +compile(spec) ValidationPlan
+}
+PlanCompiler <|.. DefaultPlanCompiler
+
+class ValidationPlan {
+  <<interface>>
+}
+
+class BatchSource {
+  <<interface>>
+  +open(source_ref)
+  +iter_records()
+  +close()
+}
+
+class CsvBatchSource
+class JsonlBatchSource
+BatchSource <|.. CsvBatchSource
+BatchSource <|.. JsonlBatchSource
+
+class BatchValidator {
+  <<interface>>
+  +validate(plan, records) ValidationReport
+}
+
+class PydanticBatchValidator
+BatchValidator <|.. PydanticBatchValidator
+
+class Sink {
+  <<interface>>
+  +write(report, target_ref)
+}
+
+class ConsoleSink
+class JsonlSink
+Sink <|.. ConsoleSink
+Sink <|.. JsonlSink
+
+class ValidationReport {
+  +total_records: int
+  +valid_records: int
+  +invalid_records: int
+  +errors: list
+}
+
+ValidationEngine --> SchemaLoader
+ValidationEngine --> PlanCompiler
+ValidationEngine --> BatchSource
+ValidationEngine --> BatchValidator
+ValidationEngine --> Sink
+```
 
 ## Project structure
 
