@@ -4,7 +4,7 @@ You can copy-paste this directly into README.md and adjust wording later.
 ⸻
 
 
-# DataChecker
+# DataChecker. 
 
 **DataChecker** is a small, extensible Python framework for **data quality validation in batch pipelines**.
 
