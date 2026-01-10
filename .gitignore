@@ -4,3 +4,14 @@
 /out/
 /.coverage
 /coverage.xml
+/.idea/DataChecker.iml
+/src/datachecker.egg-info/dependency_links.txt
+/.idea/misc.xml
+/.idea/modules.xml
+/src/datachecker.egg-info/PKG-INFO
+/.idea/inspectionProfiles/profiles_settings.xml
+/src/datachecker.egg-info/requires.txt
+/src/datachecker.egg-info/SOURCES.txt
+/src/datachecker.egg-info/top_level.txt
+/.idea/vcs.xml
+/.idea/.gitignore
