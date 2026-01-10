@@ -4,12 +4,12 @@ You can copy-paste this directly into README.md and adjust wording later.
 ⸻
 
 
-# DataChecker. 
+# DataChecker.   
 
 **DataChecker** is a small, extensible Python framework for **data quality validation in batch pipelines**.
 
 The goal of the project is to show how you can:
-- define **data schemas** in YAML
+- define **data schemas** in YAML 
 - compile them into executable validation plans
 - validate **records or batches** from different sources (CSV, JSONL, …)
 - keep the system **tool-agnostic** (Pydantic, Pandera, custom rules)
