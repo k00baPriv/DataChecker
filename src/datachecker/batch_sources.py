@@ -6,11 +6,13 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterator, Mapping, Protocol, runtime_checkable
-
+from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame
 
 # ---- Common types ----
 
 Record = Mapping[str, Any]
+
 
 # ---- Interface ----
 
@@ -23,6 +25,51 @@ class BatchSource(Protocol):
 
     # optionally:
     # def read_batches(self) -> Iterator[list[Record]]: ...
+
+
+@dataclass(frozen=True)
+class DeltaBatchSource:
+    """
+    Reads a Delta table from MinIO via Spark Connect and yields records as dicts.
+    Works with your existing ValidationEngine / validators.
+
+    Note: this streams rows to the driver using DataFrame.toLocalIterator().
+    """
+
+    spark: SparkSession
+    path: str  # e.g. "s3a://lake/delta_demo"
+
+    def _df(self) -> DataFrame:
+        return self.spark.read.format("delta").load(self.path)
+
+    def read(self) -> Iterator[Record]:
+        for row in self._df().toLocalIterator():
+            yield row.asDict(recursive=True)
+
+    def read_batches(self, batch_size: int = 1000) -> Iterator[list[Record]]:
+        if batch_size <= 0:
+            raise ValueError("batch_size must be > 0")
+
+        batch: list[Record] = []
+        for rec in self.read():
+            batch.append(rec)
+            if len(batch) >= batch_size:
+                yield batch
+                batch = []
+        if batch:
+            yield batch
+
+
+@dataclass(frozen=True)
+class SparkDataFrameBatchSource:
+    """
+    A BatchSource that yields exactly one batch: a Spark DataFrame.
+    """
+
+    df: DataFrame
+
+    def read_batches(self, batch_size: int | None = None) -> Iterator[DataFrame]:
+        yield self.df
 
 
 # ---- CSV plugin ----
