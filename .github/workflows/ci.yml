@@ -37,7 +37,7 @@ jobs:
 
       - name: Install project (dev deps)
         run: |
-          python -m pip install -e ".[dev]"
+          python -m pip install -e ".[dev,pandera]"
 
       - name: Run checks
         run: |
