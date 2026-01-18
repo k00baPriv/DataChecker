@@ -1,66 +1,49 @@
+# datachecker/types.py
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence, TypeAlias, Literal
+from typing import Any, Mapping, Protocol
 
 
-# -----------------
-# Core aliases
-# -----------------
-
-Record: TypeAlias = Mapping[str, Any]
+Record = Mapping[str, Any]
 
 
-# -----------------
-# Errors
-# -----------------
+class ValidationPlan(Protocol):
+    """Marker protocol for compiled validation plans (PydanticPlan, PanderaPlan, etc.)."""
 
-
-@dataclass(frozen=True)
-class FieldError:
-    field: str
-    message: str
-    code: str | None = None
+    ...
 
 
 @dataclass(frozen=True)
 class RowError:
     row_index: int
-    errors: Sequence[FieldError]
-    record_hint: Mapping[str, Any] | None = None
-
-
-# -----------------
-# Reports
-# -----------------
-
-
-@dataclass(frozen=True)
-class ValidationStats:
-    total: int
-    ok: int
-    bad: int
+    record_hint: dict[str, Any]
+    errors: list[dict[str, Any]]
 
 
 @dataclass(frozen=True)
 class ValidationReport:
-    schema: str
-    stats: ValidationStats
-    row_errors: Sequence[RowError]
+    schema_name: str
+
+    # For list[Record] batches, total/valid/invalid are known.
+    # For Spark DataFrames, total/valid may be None unless you trigger expensive counts.
+    total: int | None
+    valid: int | None
+    invalid: int | None
+
+    # Optional details & samples (works for both pydantic and pandera)
+    row_errors: list[RowError] | None = None
+    sample_failures: list[dict[str, Any]] | None = None
+    details: dict[str, Any] | None = None
 
     def ok(self) -> bool:
-        return self.stats.bad == 0
+        return (self.invalid or 0) == 0
 
 
-# -----------------
-# Engine events (optional)
-# -----------------
+class BatchValidator(Protocol):
+    """
+    Validate a batch (could be list[Record], pandas.DataFrame, pyspark.sql.DataFrame, etc.)
+    against a compiled plan.
+    """
 
-EventType = Literal["start", "chunk", "row", "summary", "end"]
-
-
-@dataclass(frozen=True)
-class EngineEvent:
-    event: EventType
-    schema: str
-    payload: Mapping[str, Any]
+    def validate_batch(self, plan: ValidationPlan, batch: Any) -> ValidationReport: ...
